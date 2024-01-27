@@ -85,19 +85,6 @@ services:
       - "./conf/peerswapd/policy.conf:/root/.peerswap/policy.conf"
       - "./conf/peerswapd/peerswap.conf:/root/.peerswap/peerswap.conf"
 
-  peerswap1web:
-    build:
-      context: .
-      dockerfile: ./dockerfile_web
-    restart: unless-stopped
-    depends_on:
-      - peerswap1
-    networks:
-      testing_net:
-        ipv4_address: 172.29.1.10
-    ports:
-      - "8088:8088"
-
 volumes:
   bitcoind:
   elementsd:
