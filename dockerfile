@@ -1,6 +1,6 @@
 FROM golang:1.19-alpine as builder
 
-ARG PEERSWAP_VERSION=test-1226
+ARG PEERSWAP_VERSION=premium-feature
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.

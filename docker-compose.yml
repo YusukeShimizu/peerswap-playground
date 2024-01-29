@@ -85,6 +85,28 @@ services:
       - "./conf/peerswapd/policy.conf:/root/.peerswap/policy.conf"
       - "./conf/peerswapd/peerswap.conf:/root/.peerswap/peerswap.conf"
 
+  cln1:
+    build:
+      context: .
+      dockerfile: ./dockerfile_cln
+    restart: unless-stopped
+    depends_on:
+      - bitcoind
+      - elementsd
+    networks:
+      testing_net:
+        ipv4_address: 172.29.1.7
+    command:
+      - --bitcoin-rpcconnect=bitcoind
+      - --bitcoin-rpcport=43782
+      - --bitcoin-rpcuser=user
+      - --bitcoin-rpcpassword=pass
+      - --network=regtest
+      - --log-level=debug
+      - --plugin=/usr/local/libexec/c-lightning/plugins/peerswap
+    volumes:
+      - "./conf/cln/peerswap.conf:/root/.lightning/regtest/peerswap/peerswap.conf"
+
 volumes:
   bitcoind:
   elementsd:

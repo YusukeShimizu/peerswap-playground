@@ -30,10 +30,16 @@ PUBKEY=$(./bin/lncli lnd2 getinfo  | jq -r '.identity_pubkey')
 CHANID=$(./bin/lncli lnd1 listchannels | jq -r --arg pubkey "$PUBKEY" '.channels[] | select(.remote_pubkey == $pubkey) | .chan_id')
 ```
 
+```sh
+CLNCHANID=$(./bin/clncli listfunds | jq -r --arg pubkey "$PUBKEY" '.channels[] | select(.peer_id == $pubkey) | .channel_id')
+CLNSHORTCHANID=$(./bin/clncli listfunds | jq -r --arg pubkey "$PUBKEY" '.channels[] | select(.peer_id == $pubkey) | .short_channel_id')
+```
+
 **Initiate a swapout:**
 
 ```sh
 ./bin/pscli peerswap1 swapout --channel_id $CHANID --sat_amt 1000000 --asset lbtc
+./bin/clncli peerswap-swap-out $CLNSHORTCHANID 100000 btc
 ```
 
 **Mine 3 blocks on the Liquid network:**
@@ -53,6 +59,7 @@ sleep 10
 ```sh
 ./bin/pscli peerswap1 listswaps
 ./bin/pscli peerswap2 listswaps
+./bin/clncli peerswap-listswaps
 ```
 
 **Check liquid balances:**
@@ -60,6 +67,7 @@ sleep 10
 ```sh
 ./bin/pscli peerswap1 lbtc-getbalance
 ./bin/pscli peerswap2 lbtc-getbalance
+./bin/clncli peerswap-lbtc-getbalance
 ```
 
 **Check channel balance:**
@@ -67,8 +75,7 @@ sleep 10
 ```sh
 ./bin/lncli lnd1 listchannels | grep -A 3 $CHANID
 ./bin/lncli lnd2 listchannels | grep -A 3 $CHANID
-```
-
+./bin/clncli listpeerchannels | grep -A 30 $CLNCHANID
 **Clean everything:**
 ```sh
 docker compose down --volumes
