@@ -138,6 +138,7 @@ openChannel() {
   # Generate some blocks to confirm the channel.
   mineBlocks $BITCOIN_ADDRESS 6
 
+  sleep 30
   # Open a channel between the two nodes.
   waitFor cln1 connect $LND2_NODE_URI || true
   waitFor cln1 fundchannel $LND2_PUBKEY 100000000
