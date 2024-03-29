@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+docker exec lnd_liquid-$1-1 pscli "${@:2}" || echo "Usage: pscli {NodeName, e.g. peerswap1} {pscli command, e.g. listswaps}"

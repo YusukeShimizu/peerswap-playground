@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-docker exec peerswap-playground-bitcoind-1 bitcoin-cli -rpcport=43782 -rpcuser=user -rpcpassword=pass -regtest "$@"

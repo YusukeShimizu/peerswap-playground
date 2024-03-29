@@ -1,15 +1,10 @@
-FROM golang:1.19-alpine as builder
+FROM golang:1.22.1-bullseye
 
-ARG PEERSWAP_VERSION=premium-feature
+ARG PEERSWAP_VERSION=lwk-swap
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.
 ENV GODEBUG netdns=cgo
-
-# Install dependencies and install/build lnd.
-RUN apk add --no-cache --update alpine-sdk \
-    git \
-    make 
 
 # Copy in the local repository to build from.
 RUN git clone --quiet --depth 1 --single-branch \
@@ -27,9 +22,5 @@ RUN cp /go/src/github.com/YusukeShimizu/peerswap/out/peerswapd /bin/
 RUN cp /go/src/github.com/YusukeShimizu/peerswap/out/pscli /bin/
 
 RUN mkdir -p ~/.peerswap
-
-# Add bash.
-RUN apk add --no-cache \
-    bash
 
 ENTRYPOINT ["peerswapd"]

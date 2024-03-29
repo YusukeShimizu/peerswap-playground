@@ -1,0 +1,22 @@
+FROM rust:slim-bullseye AS builder
+
+RUN apt-get update
+RUN apt-get install -y clang cmake
+RUN apt-get install -y libudev-dev
+RUN apt install -y curl jq
+RUN apt-get install -y pkg-config libssl-dev
+
+RUN apt-get -y update && apt-get -y install git && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/man/?? /usr/share/man/??_*
+RUN git clone https://github.com/Blockstream/lwk
+
+WORKDIR /lwk
+
+RUN git checkout tags/wollet_0.2.0
+RUN cargo build --release
+RUN cp /lwk/target/release/lwk_cli /usr/bin/lwk_cli
+
+EXPOSE 32113
+
+STOPSIGNAL SIGINT
+
+ENTRYPOINT ["lwk_cli"]

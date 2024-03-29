@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+docker exec lnd_lwk-elementsd-1 elements-cli "$@"
