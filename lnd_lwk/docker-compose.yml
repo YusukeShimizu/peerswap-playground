@@ -93,6 +93,8 @@ services:
     depends_on:
       - lnd1
       - elementsd
+      - electrs
+      - lwk
     networks:
       testing_net:
         ipv4_address: 172.31.1.4
@@ -115,7 +117,6 @@ services:
     volumes:
       - "lnd2:/root/.lnd"
       - "./conf/lnd/lnd.conf:/root/.lnd/lnd.conf"
-
   peerswap2:
     build:
       context: ../
@@ -124,6 +125,8 @@ services:
     depends_on:
       - lnd2
       - elementsd
+      - lwk
+      - electrs
     networks:
       testing_net:
         ipv4_address: 172.31.1.6
