@@ -24,6 +24,8 @@ PUBKEY=$(./bin/lncli lnd2 getinfo  | jq -r '.identity_pubkey')
 CHANID=$(./bin/lncli lnd1 listchannels | jq -r --arg pubkey "$PUBKEY" '.channels[] | select(.remote_pubkey == $pubkey) | .chan_id')
 ```
 
+## craim by preimage
+
 **Initiate a swapout:**
 
 ```sh
@@ -66,4 +68,34 @@ sleep 10
 **Clean everything:**
 ```sh
 docker compose down --volumes
+```
+
+## craim by coop
+
+**Initiate a swapin:**
+
+```sh
+./bin/pscli peerswap2 swapin --channel_id $CHANID --sat_amt 70000000 --asset lbtc
+./bin/lncli lnd2 addinvoice --amt 70000000
+    ./bin/lncli lnd1 sendpayment --pay_req=<invoice> -f
+```
+
+
+**Mine 3 blocks on the Liquid network:**
+
+```sh
+./bin/elements-cli -rpcwallet=peerswap1 -generate 3
+```
+
+**Wait ~10 seconds...**	
+
+```sh
+sleep 10
+```
+
+**Track progress:**
+
+```sh
+./bin/pscli peerswap1 listswaps
+./bin/pscli peerswap2 listswaps
 ```

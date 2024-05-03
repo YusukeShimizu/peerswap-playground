@@ -52,8 +52,17 @@ createLWKWallet() {
   docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s1 --mnemonic "$MNEMONIC"
   DESCRIPTOR=$(lwk signer singlesig-desc --signer s1 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
   lwk wallet load --wallet w1 -d "$DESCRIPTOR"
+  sleep 10 # waiting for blocks to be propagated
   ADDRESS=$(lwk wallet address --wallet w1 | jq -r .address)
   elementsd -rpcwallet=peerswap1 sendtoaddress $ADDRESS 1
+  elementsd -rpcwallet=peerswap1 -generate 3
+  elementsd -rpcwallet=peerswap1 rescanblockchain
+  MNEMONIC2="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s2 --mnemonic "$MNEMONIC2"
+  DESCRIPTOR=$(lwk signer singlesig-desc --signer s2 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
+  lwk wallet load --wallet w2 -d "$DESCRIPTOR"
+  ADDRESS2=$(lwk wallet address --wallet w2 | jq -r .address)
+  elementsd -rpcwallet=peerswap1 sendtoaddress $ADDRESS2 1
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain
 }
