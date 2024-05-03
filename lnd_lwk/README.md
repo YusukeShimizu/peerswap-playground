@@ -77,7 +77,7 @@ docker compose down --volumes
 ```sh
 ./bin/pscli peerswap2 swapin --channel_id $CHANID --sat_amt 70000000 --asset lbtc
 ./bin/lncli lnd2 addinvoice --amt 70000000
-    ./bin/lncli lnd1 sendpayment --pay_req=<invoice> -f
+./bin/lncli lnd1 sendpayment --pay_req=<invoice> -f
 ```
 
 

@@ -72,6 +72,55 @@ services:
     ports:
       - "32113:32113"
 
+  electrs2:
+    build:
+      context: ../
+      dockerfile: ./docker/electrs
+    restart: unless-stopped
+    depends_on:
+      elementsd:
+        condition: service_started
+    networks:
+      testing_net:
+        ipv4_address: 172.32.1.20
+    volumes:
+      - "./config.toml:/etc/electrs/config.toml"
+      - "elementsd:/root/.elements"
+    environment:
+      - RUST_BACKTRACE=1
+    command:
+      - -v
+      - --network=liquidregtest
+      - --daemon-rpc-addr=elementsd:8332
+      - --electrum-rpc-addr=0.0.0.0:37042
+      - --cookie=user:pass
+      - --daemon-dir=/root/.elements
+      - --jsonrpc-import
+    ports:
+      - "37042:37042"
+
+  lwk2:
+    build:
+      context: ../
+      dockerfile: ./docker/lwk
+    restart: unless-stopped
+    depends_on:
+      electrs2:
+        condition: service_started
+    networks:
+      testing_net:
+        ipv4_address: 172.32.1.21
+    environment:
+      - RUST_BACKTRACE=1
+    command:
+      - --network=regtest
+      - --addr=0.0.0.0:32114
+      - server
+      - start
+      - --electrum-url=electrs2:37042
+    ports:
+      - "32114:32114"
+
   lnd1:
     image: lightninglabs/lnd:v0.17.2-beta
     restart: unless-stopped
@@ -125,8 +174,8 @@ services:
     depends_on:
       - lnd2
       - elementsd
-      - lwk
-      - electrs
+      - lwk2
+      - electrs2
     networks:
       testing_net:
         ipv4_address: 172.32.1.6
@@ -144,6 +193,7 @@ volumes:
   lnd2:
   peerswap2:
   electrs:
+  electrs2:
 
 
 networks:
