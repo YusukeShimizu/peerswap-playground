@@ -12,65 +12,23 @@ services:
       - "bitcoind:/data/.bitcoin"
       - "./conf/bitcoind/bitcoin.conf:/data/.bitcoin/bitcoin.conf"
 
-  elementsd:
-    image: blockstream/elementsd:23.2.1-test
-    restart: unless-stopped
-    networks:
-      testing_net:
-        ipv4_address: 172.32.1.2
-    command: elementsd
-    volumes:
-      - "elementsd:/root/.elements"
-      - "./conf/elementsd/elements.conf:/root/.elements/elements.conf"
-
-  electrs:
-    build:
-      context: ../
-      dockerfile: ./docker/electrs
-    restart: unless-stopped
-    depends_on:
-      elementsd:
-        condition: service_started
-    networks:
-      testing_net:
-        ipv4_address: 172.32.1.9
-    volumes:
-      - "./config.toml:/etc/electrs/config.toml"
-      - "elementsd:/root/.elements"
-    environment:
-      - RUST_BACKTRACE=1
-    command:
-      - -v
-      - --network=liquidregtest
-      - --daemon-rpc-addr=elementsd:8332
-      - --electrum-rpc-addr=0.0.0.0:37041
-      - --cookie=user:pass
-      - --daemon-dir=/root/.elements
-      - --jsonrpc-import
-    ports:
-      - "37041:37041"
-
   lwk:
     build:
       context: ../
       dockerfile: ./docker/lwk
     restart: unless-stopped
-    depends_on:
-      electrs:
-        condition: service_started
     networks:
       testing_net:
         ipv4_address: 172.32.1.10
     environment:
       - RUST_BACKTRACE=1
     command:
-      - --network=regtest
-      - --addr=0.0.0.0:32113
+      - --network=mainnet
+      - --addr=0.0.0.0:32110
       - server
       - start
-      - --electrum-url=electrs:37041
     ports:
-      - "32113:32113"
+      - "32110:32110"
 
   lnd1:
     image: lightninglabs/lnd:v0.17.2-beta
@@ -92,8 +50,6 @@ services:
     restart: unless-stopped
     depends_on:
       - lnd1
-      - elementsd
-      - electrs
       - lwk
     networks:
       testing_net:
@@ -124,9 +80,7 @@ services:
     restart: unless-stopped
     depends_on:
       - lnd2
-      - elementsd
       - lwk
-      - electrs
     networks:
       testing_net:
         ipv4_address: 172.32.1.6
@@ -143,7 +97,6 @@ volumes:
   peerswap1:
   lnd2:
   peerswap2:
-  electrs:
 
 
 networks:
