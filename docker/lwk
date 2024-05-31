@@ -11,9 +11,9 @@ RUN git clone https://github.com/Blockstream/lwk
 
 WORKDIR /lwk
 
-RUN git checkout tags/wollet_0.2.0
-RUN cargo build --release
-RUN cp /lwk/target/release/lwk_cli /usr/bin/lwk_cli
+RUN git checkout tags/cli_0.3.0
+RUN cargo build --bin lwk_cli
+RUN cp /lwk/target/debug/lwk_cli /usr/bin/lwk_cli
 
 EXPOSE 32113
 
