@@ -1,6 +1,6 @@
 FROM golang:1.21.4-bullseye as builder
 
-ARG PEERSWAP_VERSION=premium-feature
+ARG PEERSWAP_VERSION=lwk-swap
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.
@@ -14,7 +14,7 @@ RUN git clone --quiet --depth 1 --single-branch \
 RUN cd /go/src/github.com/YusukeShimizu/peerswap \
     &&  make bins
 
-FROM elementsproject/lightningd:v23.11.2-arm64v8
+FROM elementsproject/lightningd:v24.05
 
 COPY --from=builder /go/src/github.com/YusukeShimizu/peerswap/out/peerswap /usr/local/libexec/c-lightning/plugins/
 RUN chmod +x /usr/local/libexec/c-lightning/plugins/peerswap

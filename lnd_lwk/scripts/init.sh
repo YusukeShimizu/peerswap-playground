@@ -22,6 +22,10 @@ lwk() {
   $DIR/../bin/lwk-cli $@
 }
 
+cln1() {
+  $DIR/../bin/clncli $@
+}
+
 waitFor() {
   until $@; do
     >&2 echo "$@ unavailable - waiting..."
@@ -65,6 +69,14 @@ createLWKWallet() {
   elementsd -rpcwallet=peerswap1 sendtoaddress $ADDRESS2 1
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain
+  MNEMONIC3="cheese clarify antique vehicle custom absurd identify abuse cheap fix jeans frozen"
+  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s3 --mnemonic "$MNEMONIC3"
+  DESCRIPTOR=$(lwk signer singlesig-desc --signer s3 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
+  lwk wallet load --wallet w3 -d "$DESCRIPTOR"
+  ADDRESS3=$(lwk wallet address --wallet w3 | jq -r .address)
+  elementsd -rpcwallet=peerswap1 sendtoaddress $ADDRESS3 1
+  elementsd -rpcwallet=peerswap1 -generate 3
+  elementsd -rpcwallet=peerswap1 rescanblockchain
 }
 
 mineBlocks() {
@@ -89,6 +101,9 @@ generateAddresses() {
 
   LND2_ADDRESS=$(lnd2 newaddress p2wkh | jq -r .address)
   echo LND2_ADDRESS: $LND2_ADDRESS
+
+  CLN1_ADDRESS=$(cln1 newaddr | jq -r .bech32)
+  echo CLN1_ADDRESS: $CLN1_ADDRESS
 }
 
 getNodeInfo() {
@@ -105,11 +120,18 @@ getNodeInfo() {
 
   LND2_PUBKEY=$(echo ${LND2_NODE_INFO} | jq -r .identity_pubkey)
   echo LND2_PUBKEY: $LND2_PUBKEY
+
+  CLN1_NODE_INFO=$(cln1 getinfo)
+  CLN1_NODE_URI=$(echo ${CLN1_NODE_INFO} | jq -r .id)@172.32.1.7:19846
+  echo CLN1_NODE_URI: $CLN1_NODE_URI
+
+  CLN1_PUBKEY=$(echo ${CLN1_NODE_INFO} | jq -r .id)
+  echo CLN1_PUBKEY: $CLN1_PUBKEY
 }
 
 sendFundingTransaction() {
   echo creating raw tx...
-  local addresses=($LND1_ADDRESS $LND2_ADDRESS)
+  local addresses=($LND1_ADDRESS $LND2_ADDRESS $CLN1_ADDRESS)
   local outputs=$(jq -nc --arg amount 1 '$ARGS.positional | reduce .[] as $address ({}; . + {($address) : ($amount | tonumber)})' --args "${addresses[@]}")
   RAW_TX=$(bitcoind createrawtransaction "[]" $outputs)
   echo RAW_TX: $RAW_TX
@@ -134,6 +156,14 @@ fundNodes() {
 
   # Generate some blocks to confirm the transactions.
   mineBlocks $BITCOIN_ADDRESS 6
+
+  sleep 30
+  # Open a channel between the two nodes.
+  waitFor cln1 connect $LND2_NODE_URI || true
+  waitFor cln1 fundchannel $LND2_PUBKEY 100000000
+
+  # Generate some blocks to confirm the channel.
+  mineBlocks $BITCOIN_ADDRESS 6
 }
 
 openChannel() {
@@ -149,6 +179,7 @@ waitForNodes() {
   waitFor bitcoind getnetworkinfo
   waitFor lnd1 getinfo
   waitFor lnd2 getinfo
+  waitFor cln1 getinfo
 }
 
 

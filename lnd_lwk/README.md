@@ -99,3 +99,55 @@ sleep 10
 ./bin/pscli peerswap1 listswaps
 ./bin/pscli peerswap2 listswaps
 ```
+
+### CLN Usage
+
+**Get the pubkey of one of the nodes:**
+
+```sh
+PUBKEY=$(./bin/lncli lnd2 getinfo  | jq -r '.identity_pubkey')
+```
+
+**Get details of channel connecting the nodes:**
+
+```sh
+CLNSHORTCHANID=$(./bin/clncli listfunds | jq -r --arg pubkey "$PUBKEY" '.channels[] | select(.peer_id == $pubkey) | .short_channel_id')
+```
+
+**Initiate a swapout:**
+
+```sh
+bin/clncli peerswap-swap-out $CLNSHORTCHANID 1000000 lbtc
+```
+
+**Mine 3 blocks on the Liquid network:**
+
+```sh
+./bin/elements-cli -rpcwallet=cln1 -generate 3
+```
+
+**Wait ~10 seconds...**	
+
+```sh
+sleep 10
+```
+
+**Track progress:**
+
+```sh
+./bin/pscli peerswap2 listswaps
+./bin/clncli peerswap-listswaps
+```
+
+**Check liquid balances:**
+
+```sh
+./bin/pscli peerswap2 lbtc-getbalance
+./bin/clncli peerswap-lbtc-getbalance
+```
+
+**Check channel balance:**
+
+```sh
+./bin/clncli listpeerchannels | grep -A 30 $CLNSHORTCHANID
+```
