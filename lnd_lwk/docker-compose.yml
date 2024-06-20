@@ -64,13 +64,12 @@ services:
     environment:
       - RUST_BACKTRACE=1
     command:
-      - --network=regtest
-      - --addr=0.0.0.0:32113
+      - --network=testnet
+      - --addr=0.0.0.0:32111
       - server
       - start
-      - --electrum-url=electrs:37041
     ports:
-      - "32113:32113"
+      - "32111:32111"
 
   lnd1:
     image: lightninglabs/lnd:v0.17.2-beta
