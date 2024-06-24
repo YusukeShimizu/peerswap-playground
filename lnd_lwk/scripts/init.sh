@@ -22,6 +22,11 @@ lwk() {
   $DIR/../bin/lwk-cli $@
 }
 
+lwk2() {
+  $DIR/../bin/lwk2-cli $@
+}
+
+
 cln1() {
   $DIR/../bin/clncli $@
 }
@@ -62,10 +67,10 @@ createLWKWallet() {
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain
   MNEMONIC2="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
-  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s2 --mnemonic "$MNEMONIC2"
-  DESCRIPTOR=$(lwk signer singlesig-desc --signer s2 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
-  lwk wallet load --wallet w2 -d "$DESCRIPTOR"
-  ADDRESS2=$(lwk wallet address --wallet w2 | jq -r .address)
+  docker exec lnd_lwk-lwk2-1 lwk_cli --network=regtest --addr=127.0.0.1:32114 signer load-software --signer s2 --mnemonic "$MNEMONIC2"
+  DESCRIPTOR=$(lwk2 signer singlesig-desc --signer s2 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
+  lwk2 wallet load --wallet w2 -d "$DESCRIPTOR"
+  ADDRESS2=$(lwk2 wallet address --wallet w2 | jq -r .address)
   elementsd -rpcwallet=peerswap1 sendtoaddress $ADDRESS2 1
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain

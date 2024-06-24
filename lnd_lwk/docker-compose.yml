@@ -72,6 +72,28 @@ services:
     ports:
       - "32113:32113"
 
+  lwk2:
+    build:
+      context: ../
+      dockerfile: ./docker/lwk
+    restart: unless-stopped
+    depends_on:
+      electrs:
+        condition: service_started
+    networks:
+      testing_net:
+        ipv4_address: 172.32.1.11
+    environment:
+      - RUST_BACKTRACE=1
+    command:
+      - --network=regtest
+      - --addr=0.0.0.0:32114
+      - server
+      - start
+      - --electrum-url=electrs:37041
+    ports:
+      - "32114:32114"
+
   lnd1:
     image: lightninglabs/lnd:v0.17.2-beta
     restart: unless-stopped
@@ -125,7 +147,7 @@ services:
     depends_on:
       - lnd2
       - elementsd
-      - lwk
+      - lwk2
       - electrs
     networks:
       testing_net:

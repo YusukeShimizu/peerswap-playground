@@ -1,15 +1,15 @@
 FROM golang:1.22.1-bullseye
 
-ARG PEERSWAP_VERSION=lwk-swap
+ARG COMMIT=3d455693552166f0a80eb53443fbfaf40d0663ee
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.
 ENV GODEBUG netdns=cgo
 
 # Copy in the local repository to build from.
-RUN git clone --quiet --depth 1 --single-branch \
-    --branch $PEERSWAP_VERSION \
-    https://github.com/YusukeShimizu/peerswap /go/src/github.com/YusukeShimizu/peerswap
+RUN git clone https://github.com/YusukeShimizu/peerswap /go/src/github.com/YusukeShimizu/peerswap && \
+    cd /go/src/github.com/YusukeShimizu/peerswap && \
+    git checkout $COMMIT
 
 RUN cd /go/src/github.com/YusukeShimizu/peerswap \
     &&  make bins

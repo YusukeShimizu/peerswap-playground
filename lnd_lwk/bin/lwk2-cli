@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+docker exec lnd_lwk-lwk2-1 lwk_cli --network=regtest --addr=127.0.0.1:32114 "$@"
