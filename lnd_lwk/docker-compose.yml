@@ -106,7 +106,8 @@ services:
     volumes:
       - "lnd1:/root/.lnd"
       - "./conf/lnd/lnd.conf:/root/.lnd/lnd.conf"
-
+    ports:
+      - "10009:10009"
   peerswap1:
     build:
       context: ../

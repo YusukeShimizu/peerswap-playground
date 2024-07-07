@@ -1,22 +1,22 @@
-FROM golang:1.21.4-bullseye as builder
+FROM golang:1.22.1-bullseye as builder
 
-ARG PEERSWAP_VERSION=lwk-swap
+ARG COMMIT=dd78a61893a2385c7f31cef86667422e699d147a
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.
 ENV GODEBUG netdns=cgo
 
 # Copy in the local repository to build from.
-RUN git clone --quiet --depth 1 --single-branch \
-    --branch $PEERSWAP_VERSION \
-    https://github.com/YusukeShimizu/peerswap /go/src/github.com/YusukeShimizu/peerswap
+RUN git clone https://github.com/elementsproject/peerswap /go/src/github.com/elementsproject/peerswap && \
+    cd /go/src/github.com/elementsproject/peerswap && \
+    git checkout $COMMIT
 
-RUN cd /go/src/github.com/YusukeShimizu/peerswap \
+RUN cd /go/src/github.com/elementsproject/peerswap \
     &&  make bins
 
-FROM elementsproject/lightningd:v24.05
+FROM elementsproject/lightningd:v23.11
 
-COPY --from=builder /go/src/github.com/YusukeShimizu/peerswap/out/peerswap /usr/local/libexec/c-lightning/plugins/
+COPY --from=builder /go/src/github.com/elementsproject/peerswap/out/peerswap /usr/local/libexec/c-lightning/plugins/
 RUN chmod +x /usr/local/libexec/c-lightning/plugins/peerswap
 RUN ls -la /
 

@@ -58,7 +58,7 @@ createElementsWallet() {
 
 createLWKWallet() {
   MNEMONIC="current enforce ignore west hammer neutral obscure shiver say welcome you license"
-  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s1 --mnemonic "$MNEMONIC"
+  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s1 --mnemonic "$MNEMONIC" --persist true
   DESCRIPTOR=$(lwk signer singlesig-desc --signer s1 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
   lwk wallet load --wallet w1 -d "$DESCRIPTOR"
   sleep 10 # waiting for blocks to be propagated
@@ -67,7 +67,7 @@ createLWKWallet() {
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain
   MNEMONIC2="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
-  docker exec lnd_lwk-lwk2-1 lwk_cli --network=regtest --addr=127.0.0.1:32114 signer load-software --signer s2 --mnemonic "$MNEMONIC2"
+  docker exec lnd_lwk-lwk2-1 lwk_cli --network=regtest --addr=127.0.0.1:32114 signer load-software --signer s2 --mnemonic "$MNEMONIC2" --persist true
   DESCRIPTOR=$(lwk2 signer singlesig-desc --signer s2 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
   lwk2 wallet load --wallet w2 -d "$DESCRIPTOR"
   ADDRESS2=$(lwk2 wallet address --wallet w2 | jq -r .address)
@@ -75,7 +75,7 @@ createLWKWallet() {
   elementsd -rpcwallet=peerswap1 -generate 3
   elementsd -rpcwallet=peerswap1 rescanblockchain
   MNEMONIC3="cheese clarify antique vehicle custom absurd identify abuse cheap fix jeans frozen"
-  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s3 --mnemonic "$MNEMONIC3"
+  docker exec lnd_lwk-lwk-1 lwk_cli --network=regtest --addr=127.0.0.1:32113 signer load-software --signer s3 --mnemonic "$MNEMONIC3" --persist true
   DESCRIPTOR=$(lwk signer singlesig-desc --signer s3 --descriptor-blinding-key slip77 --kind wpkh | jq -r .descriptor)
   lwk wallet load --wallet w3 -d "$DESCRIPTOR"
   ADDRESS3=$(lwk wallet address --wallet w3 | jq -r .address)

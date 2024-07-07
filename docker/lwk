@@ -11,7 +11,7 @@ RUN git clone https://github.com/Blockstream/lwk
 
 WORKDIR /lwk
 
-RUN git checkout tags/cli_0.3.0
+RUN git checkout 14bac284fe712dd6fdbbbe82bda179a2a236b2fa
 RUN cargo build --bin lwk_cli
 RUN cp /lwk/target/debug/lwk_cli /usr/bin/lwk_cli
 
