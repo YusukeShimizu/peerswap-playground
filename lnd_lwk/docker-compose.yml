@@ -13,7 +13,7 @@ services:
       - "./conf/bitcoind/bitcoin.conf:/data/.bitcoin/bitcoin.conf"
 
   elementsd:
-    image: blockstream/elementsd:23.2.1-test
+    image: blockstream/elementsd:23.2.2
     restart: unless-stopped
     networks:
       testing_net:
@@ -108,6 +108,7 @@ services:
       - "./conf/lnd/lnd.conf:/root/.lnd/lnd.conf"
     ports:
       - "10009:10009"
+
   peerswap1:
     build:
       context: ../

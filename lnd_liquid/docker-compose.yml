@@ -13,7 +13,7 @@ services:
       - "./conf/bitcoind/bitcoin.conf:/data/.bitcoin/bitcoin.conf"
 
   elementsd:
-    image: blockstream/elementsd:22.1.1
+    image: blockstream/elementsd:23.2.2
     restart: unless-stopped
     networks:
       testing_net:
@@ -22,6 +22,8 @@ services:
     volumes:
       - "elementsd:/root/.elements"
       - "./conf/elementsd/elements.conf:/root/.elements/elements.conf"
+    ports:
+      - "8332:8332"
 
   lnd1:
     image: lightninglabs/lnd:v0.17.2-beta
@@ -35,6 +37,8 @@ services:
     volumes:
       - "lnd1:/root/.lnd"
       - "./conf/lnd/lnd.conf:/root/.lnd/lnd.conf"
+    ports:
+      - "10009:10009"
 
   peerswap1:
     build:
@@ -53,6 +57,7 @@ services:
       - "peerswap1:/root/.peerswap"
       - "./conf/peerswapd/policy.conf:/root/.peerswap/policy.conf"
       - "./conf/peerswapd/peerswap.conf:/root/.peerswap/peerswap.conf"
+      - "./conf/peerswapd/cookie:/root/.peerswap/cookie"
 
   lnd2:
     image: lightninglabs/lnd:v0.17.2-beta
@@ -66,8 +71,6 @@ services:
     volumes:
       - "lnd2:/root/.lnd"
       - "./conf/lnd/lnd.conf:/root/.lnd/lnd.conf"
-    ports:
-      - "10009:10009"
 
   peerswap2:
     build:
@@ -86,6 +89,7 @@ services:
       - "peerswap2:/root/.peerswap"
       - "./conf/peerswapd/policy.conf:/root/.peerswap/policy.conf"
       - "./conf/peerswapd/peerswap.conf:/root/.peerswap/peerswap.conf"
+      - "./conf/peerswapd/cookie:/root/.peerswap/cookie"
 
 volumes:
   bitcoind:

@@ -1,6 +1,6 @@
 FROM golang:1.22.1-bullseye
 
-ARG COMMIT=95b998382a075463c251448337bafa8067c2894e
+ARG COMMIT=065b87c6973726e1225b5a0b256a2bc603dae1ab
 
 # Force Go to use the cgo based DNS resolver. This is required to ensure DNS
 # queries required to connect to linked containers succeed.
