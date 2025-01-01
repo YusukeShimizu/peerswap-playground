@@ -22,7 +22,8 @@ services:
     volumes:
       - "elementsd:/root/.elements"
       - "./conf/elementsd/elements.conf:/root/.elements/elements.conf"
-
+    ports:
+      - "8332:8332"
   electrs:
     build:
       context: ../
